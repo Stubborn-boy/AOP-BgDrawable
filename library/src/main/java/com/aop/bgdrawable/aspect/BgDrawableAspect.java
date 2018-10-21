@@ -17,13 +17,9 @@ public class BgDrawableAspect {
     @Around("call(* android.*.*.findViewById(..)) && !within(android.support..*) && !within(butterknife..*)")
     public Object executionfindViewById(ProceedingJoinPoint joinPoint) throws Throwable {
         Object returnValue = joinPoint.proceed();
-        Log.e("TAG", joinPoint.getSignature().getName());
-        Log.e("TAG", joinPoint.getTarget().getClass().toString());
-        Log.e("TAG", joinPoint.getThis().getClass().toString());
         Field[] fields = joinPoint.getThis().getClass().getDeclaredFields();
         for(Field field : fields){
             field.setAccessible(true);
-            field.get(joinPoint.getThis());
             BgDrawable anno = field.getAnnotation(BgDrawable.class);
             if(anno!=null && returnValue!=null) {
                 View view = (View) returnValue;
@@ -39,9 +35,6 @@ public class BgDrawableAspect {
 
     @After("initialization(* ..*_ViewBinding.new(..)) && target(butterknife.Unbinder)")
     public void executionbButterknife(JoinPoint joinPoint) throws Throwable {
-        Log.e("TAG", joinPoint.getSignature().getName());
-        Log.e("TAG", joinPoint.getTarget().getClass().toString());
-
         Object target = joinPoint.getArgs()[0];
         Field[] fields = target.getClass().getDeclaredFields();
         for(Field field : fields){
